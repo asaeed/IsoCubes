@@ -1,6 +1,83 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 
+// various animations to perform on blocks
+// this was separated out from blockGridController
+// caller should pass appropriate scope to these functions using .call(scope, params...)
+
+exports.appearFromFlat = function(block, x, y) {
+    // first make them flat
+    block.size.z = 0.01;
+
+    block.visible = true;
+
+    // now appear and grow to size 1
+    var t2 = new TWEEN.Tween(block.size)
+        .to({ z: 1 }, 1000)
+        .easing(TWEEN.Easing.Quadratic.In)
+        .delay(x/this.gridSizeX * 1000)
+        .start();
+};
+
+exports.appearFromBelow = function(block, x, y) {
+    var distanceBelow = 60;
+
+    // first position them below
+    block.pos.x += -distanceBelow;
+    block.pos.y += -distanceBelow;
+
+    block.visible = true;
+
+    // now appear by shooting up in a staggered manner
+    var t2 = new TWEEN.Tween(block.pos)
+        .to({ x: block.pos.x + distanceBelow, y: block.pos.y + distanceBelow }, 2000)
+        .easing(TWEEN.Easing.Quadratic.Out)
+        .delay((x/this.gridSizeX + y/this.gridSizeY) * -1000 + 1200)
+        .start();
+};
+
+exports.appearFromTransparent = function(block, x, y) {
+    // first make invisible
+    block.color.a = 0.01;
+
+    block.visible = true;
+
+    // now fade in in a random pattern
+    var t2 = new TWEEN.Tween(block.color)
+        .to({ a: 0.5 }, 400)
+        .easing(TWEEN.Easing.Quadratic.Out)
+        .delay(Math.random() * 4000)
+        .start();
+};
+
+exports.grow = function(block, x, y) {
+    var maxHeight = 8;
+
+    // construct variable targetSize = { z: newHeight }
+    var targetSize = {};
+    targetSize[this.extendDirection] = Math.random() * maxHeight;
+
+    var t = new TWEEN.Tween(block.size)
+        .to(targetSize, 2000)
+        .easing(TWEEN.Easing.Cubic.Out)
+        .delay(x/this.gridSizeX * 500)
+        .start();
+};
+
+exports.reset = function(block, x, y) {
+    var targetSize = {};
+    targetSize[this.extendDirection] = 1;
+
+    var t = new TWEEN.Tween(block.size)
+        .to(targetSize, 6000)
+        .easing(TWEEN.Easing.Quadratic.InOut)
+        .delay(x/this.gridSizeX * 2000)
+        .start();
+};
+},{}],2:[function(require,module,exports){
+
 var BlockGridController = require('./blockGridController');
+var selector = require('./blockSelector');
+var animator = require('./blockAnimator');
 
 // private variables
 var iso = new Isomer(document.getElementById("canvas"));
@@ -29,22 +106,53 @@ exports.setup = function() {
 	blockGrids.blue.setup();
 	blockGrids.blue.offset = { x: 0, y: 0, z: 1 };
 	blockGrids.blue.extendDirection = 'z';
-
-	exports.beginSequence();
 };
 
 exports.draw = function() {
 	blockGrids.orange.draw();
-	blockGrids.green.draw();
 	blockGrids.blue.draw();
+	blockGrids.green.draw();
+	
 };
 
-exports.beginSequence = function() {
-	blockGrids.orange.grow();
-	blockGrids.green.grow();
-	blockGrids.blue.grow();
+exports.goToState = function(stateNum) {
+
+	switch(stateNum) {
+		case 0:
+			console.log('blocks entering state 0');
+			break;
+		case 1:
+			console.log('blocks entering state 1');
+			// selector.forSomeInvisibleBlocks.call(blockGrids.orange, 0.6, animator.appearFromTransparent);
+			// selector.forSomeInvisibleBlocks.call(blockGrids.blue, 0.6, animator.appearFromTransparent);
+			// selector.forSomeInvisibleBlocks.call(blockGrids.green, 0.6, animator.appearFromTransparent);
+			selector.forInvisibleBlocks.call(blockGrids.orange, animator.appearFromTransparent);
+			selector.forInvisibleBlocks.call(blockGrids.blue, animator.appearFromTransparent);
+			selector.forInvisibleBlocks.call(blockGrids.green, animator.appearFromTransparent);
+			break;
+		case 2:
+			console.log('blocks entering state 3');
+			selector.forAllBlocks.call(blockGrids.orange, animator.grow);
+			selector.forAllBlocks.call(blockGrids.blue, animator.grow);
+			selector.forAllBlocks.call(blockGrids.green, animator.grow);
+			setTimeout(function() { exports.goToState.call(this, 3); }, 3500);
+			break;
+		case 3:
+			console.log('blocks entering state 4');
+			selector.forAllBlocks.call(blockGrids.orange, animator.reset);
+			selector.forAllBlocks.call(blockGrids.blue, animator.reset);
+			selector.forAllBlocks.call(blockGrids.green, animator.reset);
+			setTimeout(function() { exports.goToState.call(this, 2); }, 10000);
+			break;
+		default:
+			console.log('blocks unknown state');
+	}
+	
+
+	// old way, before selector and animator separated out
+	//blockGrids.orange.forSomeRandomBlocks.call(blockGrids.orange, 0.4, blockGrids.orange.appearFromBelow);
 };
-},{"./blockGridController":2}],2:[function(require,module,exports){
+},{"./blockAnimator":1,"./blockGridController":3,"./blockSelector":4}],3:[function(require,module,exports){
 
 // dependencies
 var iso = new Isomer(document.getElementById("canvas"));
@@ -54,36 +162,37 @@ var Shape = Isomer.Shape;
 var Color = Isomer.Color;
 
 function BlockGridController(color) {
-	// defaults
-	console.log(color);
-	if (typeof color === 'undefined')
-		color = new Color(99, 102, 106);
+    // defaults
+    if (typeof color === 'undefined')
+        color = new Color(99, 102, 106);
 
-	// private vars
-	this.color = color;
-	this.blocks = [];
-	this.blockSize = 1;
-	this.gridSizeX = 12;
-	this.gridSizeY = 12;
-	this.spaceApart = this.blockSize * 3;
-	this.origin = new Point(-6, -6, 0);
+    // private vars
+    this.color = color;
+    this.blocks = [];
+    this.blockSize = 1;
+    this.gridSizeX = 12;
+    this.gridSizeY = 12;
+    this.spaceApart = this.blockSize * 3;
+    this.origin = new Point(-2, -2, 0);
 
-	this.blockTemplate = Shape.Prism(this.origin, this.blockSize, this.blockSize, this.blockSize);
+    this.blockTemplate = Shape.Prism(this.origin, this.blockSize, this.blockSize, this.blockSize);
 }
 
 // public vars
-BlockGridController.prototype.transparency = 0.5;
 BlockGridController.prototype.visible = true;
 BlockGridController.prototype.offset = { x: 0, y: 0, z: 0 };
 BlockGridController.prototype.extendDirection = 'x';
 
 // public functions
 BlockGridController.prototype.setup = function () {
-	// setup buildings 2d array
+    // setup buildings 2d array
     for (var x = 0; x < this.gridSizeX; x++) {
         this.blocks[x] = [];
         for (var y = 0; y < this.gridSizeY; y++) {
             this.blocks[x][y] = {};
+            this.blocks[x][y].visible = false;
+
+            this.blocks[x][y].color = new Color(this.color.r, this.color.g, this.color.b, this.color.a);
             
             this.blocks[x][y].size = {};
             this.blocks[x][y].size.x = 1;
@@ -99,169 +208,80 @@ BlockGridController.prototype.setup = function () {
 };
 
 BlockGridController.prototype.draw = function() {
-	if (this.visible === false) return;
+    if (this.visible === false) return;
     // have to draw backwards to maintain relative depth
     for (var x = this.gridSizeX - 1; x >= 0; x--) {
         for (var y = this.gridSizeY - 1; y >= 0; y--) {
+
+            if (!this.blocks[x][y].visible) continue;
+
             var size = this.blocks[x][y].size;
             var pos = this.blocks[x][y].pos;
             var off = this.offset;
-            var b = this.blockTemplate.translate(pos.x + off.x, pos.y + off.y, pos.z + off.z)
-                .scale(this.origin, size.x, size.y, size.z);
+            var newPos = { x: this.origin.x + pos.x + off.x, y: this.origin.y + pos.y + off.y, z: this.origin.z + pos.z + off.z };
+            var b = this.blockTemplate.translate(newPos.x, newPos.y, newPos.z)
+                .scale(newPos, size.x, size.y, size.z);
 
-            iso.add(b, this.color);
+            var c = this.blocks[x][y].color;
+            iso.add(b, c);
             //iso.add(b);
         }
     }
 };
 
-BlockGridController.prototype.appear = function(color) {
-    // first make them flat
+module.exports = BlockGridController;
+},{}],4:[function(require,module,exports){
+
+// various ways to select blocks
+// this was separated out from blockGridController
+// caller should pass appropriate scope to these functions using .call(scope, params...)
+// these functions in turn pass along scope to callback
+
+exports.forAllBlocks = function(callback) {
     for (var a = 0; a < this.gridSizeX; a++) {
         for (var b = 0; b < this.gridSizeY; b++) {
-            var t1 = new TWEEN.Tween(this.blocks[a][b].size)
-                .to({ y: 0 }, 10)
-                .start();
+            callback.call(this, this.blocks[a][b], a, b);
         }
     }
+};
 
-    this.visible = true;
-
-    // now appear and grow to size 1
-    for (var x = 0; x < this.gridSizeX; x++) {
-        for (var y = 0; y < this.gridSizeY; y++) {
-            var t2 = new TWEEN.Tween(this.blocks[x][y].size)
-                .to({ y: 1 }, 1500)
-                .easing(TWEEN.Easing.Quadratic.In)
-                .delay(x/this.gridSizeX * 500)
-                .start();
+exports.forSomeRandomBlocks = function(prob, callback) {
+    for (var a = 0; a < this.gridSizeX; a++) {
+        for (var b = 0; b < this.gridSizeY; b++) {
+            if (Math.random() <= prob) {
+                callback.call(this, this.blocks[a][b], a, b);
+            }
         }
     }
-
-    //setTimeout(this.reset, 3000);
 };
 
-BlockGridController.prototype.grow = function() {
-    var maxHeight = 8;
-
-    for (var x = 0; x < this.gridSizeX; x++) {
-        for (var y = 0; y < this.gridSizeY; y++) {
-
-        	// to get something of the form:
-        	// { y: Math.random() * maxHeight }
-        	var targetSize = {};
-        	targetSize[this.extendDirection] = Math.random() * maxHeight;
-
-            var t = new TWEEN.Tween(this.blocks[x][y].size)
-                .to(targetSize, 3000)
-                .easing(TWEEN.Easing.Cubic.Out)
-                .delay(x/this.gridSizeX * 500)
-                .start();
+exports.forVisibleBlocks = function(callback) {
+    for (var a = 0; a < this.gridSizeX; a++) {
+        for (var b = 0; b < this.gridSizeY; b++) {
+            if (this.blocks[a][b].visible)
+                callback.call(this, this.blocks[a][b], a, b);
         }
     }
-
-    setTimeout(this.reset.bind(this), 3500);
 };
 
-BlockGridController.prototype.reset = function() {
-    for (var x = 0; x < this.gridSizeX; x++) {
-        for (var y = 0; y < this.gridSizeY; y++) {
-
-        	var targetSize = {};
-        	targetSize[this.extendDirection] = 1;
-
-            var t = new TWEEN.Tween(this.blocks[x][y].size)
-                .to(targetSize, 6000)
-                .easing(TWEEN.Easing.Quadratic.InOut)
-                .delay(x/this.gridSizeX * 2000)
-                .start();
+exports.forInvisibleBlocks = function(callback) {
+    for (var a = 0; a < this.gridSizeX; a++) {
+        for (var b = 0; b < this.gridSizeY; b++) {
+            if (!this.blocks[a][b].visible)
+                callback.call(this, this.blocks[a][b], a, b);
         }
     }
-
-    setTimeout(this.grow.bind(this), 10000);
 };
 
-module.exports = BlockGridController;
-},{}],3:[function(require,module,exports){
-
-var Point = Isomer.Point;
-var Path = Isomer.Path;
-var Shape = Isomer.Shape;
-var Color = Isomer.Color;
-
-exports.Stairs = function (origin) {
-  var STEP_COUNT = 10;
-
-  /* Create a zig-zag */
-  var zigzag = new Path(origin);
-  var steps = [], i;
-
-  /* Shape to return */
-  var stairs = new Shape();
-
-  for (i = 0; i < STEP_COUNT; i++) {
-    /**
-     *  2
-     * __
-     *   | 1
-     */
-
-    var stepCorner = origin.translate(0, i / STEP_COUNT, (i + 1) / STEP_COUNT);
-    /* Draw two planes */
-    steps.push(new Path([
-      stepCorner,
-      stepCorner.translate(0, 0, -1 / STEP_COUNT),
-      stepCorner.translate(1, 0, -1 / STEP_COUNT),
-      stepCorner.translate(1, 0, 0)
-    ]));
-
-    steps.push(new Path([
-      stepCorner,
-      stepCorner.translate(1, 0, 0),
-      stepCorner.translate(1, 1 / STEP_COUNT, 0),
-      stepCorner.translate(0, 1 / STEP_COUNT, 0)
-    ]));
-
-    zigzag.push(stepCorner);
-    zigzag.push(stepCorner.translate(0, 1 / STEP_COUNT, 0));
-  }
-
-  zigzag.push(origin.translate(0, 1, 0));
-
-
-  for (i = 0; i < steps.length; i++) {
-    stairs.push(steps[i]);
-  }
-  stairs.push(zigzag);
-  stairs.push(zigzag.reverse().translate(1, 0, 0));
-
-  return stairs;
+exports.forSomeInvisibleBlocks = function(prob, callback) {
+    for (var a = 0; a < this.gridSizeX; a++) {
+        for (var b = 0; b < this.gridSizeY; b++) {
+            if (!this.blocks[a][b].visible && Math.random() <= prob)
+                callback.call(this, this.blocks[a][b], a, b);
+        }
+    }
 };
-
-exports.Knot = function (origin) {
-  var knot = new Shape();
-
-  knot.paths = knot.paths.concat(Shape.Prism(Point.ORIGIN, 5, 1, 1).paths);
-  knot.paths = knot.paths.concat(Shape.Prism(new Point(4, 1, 0), 1, 4, 1).paths);
-  knot.paths = knot.paths.concat(Shape.Prism(new Point(4, 4, -2), 1, 1, 3).paths);
-
-  knot.push(new Path([
-    new Point(0, 0, 2),
-    new Point(0, 0, 1),
-    new Point(1, 0, 1),
-    new Point(1, 0, 2)
-  ]));
-
-  knot.push(new Path([
-    new Point(0, 0, 2),
-    new Point(0, 1, 2),
-    new Point(0, 1, 1),
-    new Point(0, 0, 1)
-  ]));
-
-  return knot.scale(Point.ORIGIN, 1/5).translate(-0.1, 0.15, 0.4).translate(origin.x, origin.y, origin.z);
-};
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 
 // controlled params
 var guiParams = function() {
@@ -283,6 +303,7 @@ exports.params = new guiParams();
 
 exports.setup = function() {
     var gui = new dat.GUI();
+    dat.GUI.toggleHide();
 
     gui.addColor(exports.params, 'canvasColor').onChange(function(value) {
         $('#canvas').css('background-color', value);
@@ -300,10 +321,10 @@ exports.setup = function() {
     //gui.add(exports.params, 'displayOutline');
     //gui.add(exports.params, 'explode');
 };
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 
 // imports
-var CustomShape = require('./customShape');
+//var CustomShape = require('./customShape');
 var BlockController = require('./blockController');
 var Gui = require('./gui');
 
@@ -317,7 +338,7 @@ function init() {
 }
 
 function animate(time) {
-    window.requestAnimationFrame(animate);
+    requestAnimationFrame(animate);
     TWEEN.update(time);
     iso.canvas.clear();
 
@@ -339,13 +360,40 @@ $(window).scroll(function(e){
 });
 
 window.onbeforeunload = function(){
-    window.scrollTo(0,0);
+    window.scrollTo(0, 0);
 };
 
-// lets go
+// main
 (function () {
+    // setup canvas
     init();
     animate();
+
+    // setup full-panel, smaller panel behind it
+    $('.begin-arrow').velocity({ 'top': '12px' }, { loop: true });
+    $('.panel').velocity("transition.slideUpIn");
+
+    // go to initial block states
+    BlockController.goToState(0);
 })();
 
-},{"./blockController":1,"./customShape":3,"./gui":4}]},{},[5]);
+$('.full-panel').click(function() {
+    // slide up full-panel
+    $('.full-panel').velocity({ 'top': '-100%' }, {
+        duration: 1000,
+        easing: "easeInQuart",
+    });
+
+    // slowly fade in years text
+    $('.years-text span').velocity("transition.fadeIn", { delay: 1500, stagger: 320 });
+
+    // at the same time, begin populating hex tiles
+    setTimeout( function() { BlockController.goToState(1); }, 1500);
+
+    // finally show confetti and other content and make blocks grow
+    $('.panel-top').velocity("transition.fadeIn", { delay: 8000 });
+    $('.panel-bottom').velocity("transition.fadeIn", { delay: 8000 });
+    setTimeout( function() { BlockController.goToState(2); }, 7000);
+});
+
+},{"./blockController":2,"./gui":5}]},{},[6]);

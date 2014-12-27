@@ -19,6 +19,7 @@ exports.params = new guiParams();
 
 exports.setup = function() {
     var gui = new dat.GUI();
+    dat.GUI.toggleHide();
 
     gui.addColor(exports.params, 'canvasColor').onChange(function(value) {
         $('#canvas').css('background-color', value);

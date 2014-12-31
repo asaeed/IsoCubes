@@ -6,21 +6,21 @@ var Path = Isomer.Path;
 var Shape = Isomer.Shape;
 var Color = Isomer.Color;
 
-function BlockGridController(color) {
+function BlockGridController(color, blockSize) {
     // defaults
     if (typeof color === 'undefined')
         color = new Color(99, 102, 106);
 
     // private vars
     this.color = color;
+    this.blockSize = blockSize;
     this.blocks = [];
-    this.blockSize = 1;
-    this.gridSizeX = 12;
-    this.gridSizeY = 12;
-    this.spaceApart = this.blockSize * 3;
-    this.origin = new Point(-2, -2, 0);
+    this.gridSizeX = 16;
+    this.gridSizeY = 16;
+    this.spaceApart = blockSize * 3;
+    this.origin = new Point(0, 0, -6);
 
-    this.blockTemplate = Shape.Prism(this.origin, this.blockSize, this.blockSize, this.blockSize);
+    this.blockTemplate = Shape.Prism(this.origin, blockSize, blockSize, blockSize);
 }
 
 // public vars
@@ -34,6 +34,13 @@ BlockGridController.prototype.setup = function () {
     for (var x = 0; x < this.gridSizeX; x++) {
         this.blocks[x] = [];
         for (var y = 0; y < this.gridSizeY; y++) {
+
+            // optimization - remove blocks that are offscreen
+            if (x+y < 4) continue;  // cut off bottom
+            if (x+y >= 28) continue;  // cut off top
+            if (x+this.gridSizeY-y <= 12) continue;  // cut off left
+            if (x+this.gridSizeY-y > 20) continue;  // cut off right
+
             this.blocks[x][y] = {};
             this.blocks[x][y].visible = false;
 
@@ -58,7 +65,7 @@ BlockGridController.prototype.draw = function() {
     for (var x = this.gridSizeX - 1; x >= 0; x--) {
         for (var y = this.gridSizeY - 1; y >= 0; y--) {
 
-            if (!this.blocks[x][y].visible) continue;
+            if (typeof this.blocks[x][y] === 'undefined' || !this.blocks[x][y].visible) continue;
 
             var size = this.blocks[x][y].size;
             var pos = this.blocks[x][y].pos;

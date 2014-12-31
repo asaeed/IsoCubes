@@ -44,7 +44,7 @@ exports.appearFromTransparent = function(block, x, y) {
     var t2 = new TWEEN.Tween(block.color)
         .to({ a: 0.5 }, 400)
         .easing(TWEEN.Easing.Quadratic.Out)
-        .delay(Math.random() * 4000)
+        .delay(Math.random() * 4500)
         .start();
 };
 

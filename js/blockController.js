@@ -9,26 +9,32 @@ var Color = Isomer.Color;
 
 var transparency = 0.5;
 var colors = {};
-colors.orange = new Color(247, 145, 29, transparency);
-colors.blue = new Color(0, 172, 221, transparency);
-colors.green = new Color(121, 192, 66, transparency);
+// studios colors
+//colors.orange = new Color(247, 145, 29, transparency);
+//colors.blue = new Color(0, 172, 221, transparency);
+//colors.green = new Color(121, 192, 66, transparency);
+// altered colors
+colors.orange = new Color(255, 136, 39, transparency);
+colors.blue = new Color(7, 185, 226, transparency);
+colors.green = new Color(121, 209, 70, transparency);
 
+var blockSize = 1;
 var blockGrids = {};
-blockGrids.orange = new BlockGridController(colors.orange);
-blockGrids.green = new BlockGridController(colors.green);
-blockGrids.blue = new BlockGridController(colors.blue);
+blockGrids.orange = new BlockGridController(colors.orange, blockSize);
+blockGrids.green = new BlockGridController(colors.green, blockSize);
+blockGrids.blue = new BlockGridController(colors.blue, blockSize);
 
 exports.setup = function() {
 	blockGrids.orange.setup();
-	blockGrids.orange.offset = { x: -1, y: 0, z: 0 };
+	blockGrids.orange.offset = { x: -blockSize, y: 0, z: 0 };
 	blockGrids.orange.extendDirection = 'x';
 	
 	blockGrids.green.setup();
-	blockGrids.green.offset = { x: 0, y: -1, z: 0 };
+	blockGrids.green.offset = { x: 0, y: -blockSize, z: 0 };
 	blockGrids.green.extendDirection = 'y';
 
 	blockGrids.blue.setup();
-	blockGrids.blue.offset = { x: 0, y: 0, z: 1 };
+	blockGrids.blue.offset = { x: 0, y: 0, z: blockSize };
 	blockGrids.blue.extendDirection = 'z';
 };
 

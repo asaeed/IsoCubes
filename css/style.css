@@ -2,18 +2,32 @@
 @font-face {
     font-family: studiosFont;
     src: url("../font/StudiosFutura-Book.otf") format('opentype');
+    src: url('../font/StudiosFutura-Book/studiosfutura-book-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../font/StudiosFutura-Book/studiosfutura-book-webfont.woff2') format('woff2'),
+         url('../font/StudiosFutura-Book/studiosfutura-book-webfont.woff') format('woff'),
+         url('../font/StudiosFutura-Book/studiosfutura-book-webfont.ttf') format('truetype'),
+         url('../font/StudiosFutura-Book/studiosfutura-book-webfont.svg#studios_futurabook') format('svg');
 }
 
 @font-face {
     font-family: studiosFontBold;
     src: url("../font/StudiosFutura-Bold.otf") format('opentype');
+    src: url('../font/StudiosFutura-Bold/studiosfutura-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../font/StudiosFutura-Bold/studiosfutura-bold-webfont.woff2') format('woff2'),
+         url('../font/StudiosFutura-Bold/studiosfutura-bold-webfont.woff') format('woff'),
+         url('../font/StudiosFutura-Bold/studiosfutura-bold-webfont.ttf') format('truetype'),
+         url('../font/StudiosFutura-Bold/studiosfutura-bold-webfont.svg#studios_futurabold') format('svg');
+
 }
 
 body {
     font-family: helvetica;
     margin: 0 auto;
-    width: 100%;
-    height: 1600px;
+    min-width: 360px;
+
+    /* uncomment this and comment the following to enable scrolling if scrolling site needed */
+    /* height: 1600px; */
+    overflow: hidden;
 }
 
 ::-webkit-scrollbar { width: 0 !important }
@@ -55,10 +69,9 @@ body {
 }
 
 .begin-text {
-    font-family: studiosFont, helvetica;
+    font-family: studiosFontBold, helvetica;
     text-transform: uppercase;
     font-size: 18px;
-    font-weight: bold;
     padding: 2px;
 }
 
@@ -69,24 +82,25 @@ body {
 }
 
 .en {
-    color: #b1b3b3;
+    color: #ffffff;
 }
 
 .fr {
-    color: #63666a;
+    color: #bebec0;
 }
 
 #panel-wrapper {
     position: fixed;
     width: 100%;
     height: 100%;
+    min-width: 360px;
+    min-height: 280px;
 }
 
 .panel {
     width: 600px;
-    height: 400px;
-    margin: 80px auto;
-    opacity: 0;
+    height: 420px;
+    margin: 0 auto;
     background-color: #252525;
     font-family: studiosFontBold, helvetica;
 
@@ -98,8 +112,9 @@ body {
 }
 
 .panel-top {
-    font-size: 18px;
+    font-size: 20px;
     line-height: 22px;
+    text-transform: uppercase;
     padding: 20px;
     opacity: 0;
 }
@@ -122,9 +137,10 @@ body {
 
 .new-year-text {
     display: inline-block;
-    width: 180px;
-    font-size: 20px;
-    line-height: 22px;
+    width: 188px;
+    font-size: 18px;
+    line-height: 20px;
+    text-transform: uppercase;
     padding: 0 0 20px 20px;
 }
 
@@ -132,4 +148,86 @@ body {
     width: 120px;
     float: right;
     margin: 28px 20px;
+}
+
+.confetti {
+    position: absolute;
+    width: 400px;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    z-index: -1;
+    opacity: 0;
+}
+
+@media (max-width: 600px) {
+   .panel {
+        width: 100%;
+        height: 336px;
+   }
+
+   .years-text {
+        font-size: 66px;
+        letter-spacing: -10px;
+    }
+
+    .panel-top {
+        font-size: 18px;
+        line-height: 20px;
+        padding: 10px 0 0 10px;
+    }
+
+    .new-year-text {
+        width: 127px;
+        font-size: 14px;
+        line-height: 16px;
+        padding: 0 0 10px 10px;
+    }
+
+    .confetti {
+        width: 360px;
+    }
+
+    .logo-small {
+        margin: 30px 8px 0 0;
+        width: 72px;
+    }
+}
+
+@media (min-width: 1200px) {
+   .panel {
+        width: 800px;
+        height: 600px;
+   }
+
+   .years-text {
+        font-size: 128px;
+        letter-spacing: -20px;
+        padding: 118px 0;
+    }
+
+    .panel-top {
+        font-size: 28px;
+        line-height: 30px;
+    }
+
+    .panel-bottom {
+        font-size: 28px;
+        line-height: 30px;
+    }
+
+    .new-year-text {
+        width: 236px;
+        font-size: 26px;
+        line-height: 28px;
+    }
+
+    .confetti {
+        width: 600px;
+    }
+
+    .logo-small {
+        width: 160px;
+        float: right;
+        margin: 40px 32px;
+    }
 }

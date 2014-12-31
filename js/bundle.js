@@ -89,22 +89,23 @@ colors.orange = new Color(247, 145, 29, transparency);
 colors.blue = new Color(0, 172, 221, transparency);
 colors.green = new Color(121, 192, 66, transparency);
 
+var blockSize = 1;
 var blockGrids = {};
-blockGrids.orange = new BlockGridController(colors.orange);
-blockGrids.green = new BlockGridController(colors.green);
-blockGrids.blue = new BlockGridController(colors.blue);
+blockGrids.orange = new BlockGridController(colors.orange, blockSize);
+blockGrids.green = new BlockGridController(colors.green, blockSize);
+blockGrids.blue = new BlockGridController(colors.blue, blockSize);
 
 exports.setup = function() {
 	blockGrids.orange.setup();
-	blockGrids.orange.offset = { x: -1, y: 0, z: 0 };
+	blockGrids.orange.offset = { x: -blockSize, y: 0, z: 0 };
 	blockGrids.orange.extendDirection = 'x';
 	
 	blockGrids.green.setup();
-	blockGrids.green.offset = { x: 0, y: -1, z: 0 };
+	blockGrids.green.offset = { x: 0, y: -blockSize, z: 0 };
 	blockGrids.green.extendDirection = 'y';
 
 	blockGrids.blue.setup();
-	blockGrids.blue.offset = { x: 0, y: 0, z: 1 };
+	blockGrids.blue.offset = { x: 0, y: 0, z: blockSize };
 	blockGrids.blue.extendDirection = 'z';
 };
 
@@ -161,21 +162,21 @@ var Path = Isomer.Path;
 var Shape = Isomer.Shape;
 var Color = Isomer.Color;
 
-function BlockGridController(color) {
+function BlockGridController(color, blockSize) {
     // defaults
     if (typeof color === 'undefined')
         color = new Color(99, 102, 106);
 
     // private vars
     this.color = color;
+    this.blockSize = blockSize;
     this.blocks = [];
-    this.blockSize = 1;
-    this.gridSizeX = 12;
-    this.gridSizeY = 12;
-    this.spaceApart = this.blockSize * 3;
-    this.origin = new Point(-2, -2, 0);
+    this.gridSizeX = 16;
+    this.gridSizeY = 16;
+    this.spaceApart = blockSize * 3;
+    this.origin = new Point(0, 0, -6);
 
-    this.blockTemplate = Shape.Prism(this.origin, this.blockSize, this.blockSize, this.blockSize);
+    this.blockTemplate = Shape.Prism(this.origin, blockSize, blockSize, blockSize);
 }
 
 // public vars
@@ -189,6 +190,13 @@ BlockGridController.prototype.setup = function () {
     for (var x = 0; x < this.gridSizeX; x++) {
         this.blocks[x] = [];
         for (var y = 0; y < this.gridSizeY; y++) {
+
+            // optimization - remove blocks that are offscreen
+            if (x+y < 4) continue;  // cut off bottom
+            if (x+y >= 28) continue;  // cut off top
+            if (x+this.gridSizeY-y <= 12) continue;  // cut off left
+            if (x+this.gridSizeY-y > 20) continue;  // cut off right
+
             this.blocks[x][y] = {};
             this.blocks[x][y].visible = false;
 
@@ -213,7 +221,7 @@ BlockGridController.prototype.draw = function() {
     for (var x = this.gridSizeX - 1; x >= 0; x--) {
         for (var y = this.gridSizeY - 1; y >= 0; y--) {
 
-            if (!this.blocks[x][y].visible) continue;
+            if (typeof this.blocks[x][y] === 'undefined' || !this.blocks[x][y].visible) continue;
 
             var size = this.blocks[x][y].size;
             var pos = this.blocks[x][y].pos;
@@ -240,6 +248,7 @@ module.exports = BlockGridController;
 exports.forAllBlocks = function(callback) {
     for (var a = 0; a < this.gridSizeX; a++) {
         for (var b = 0; b < this.gridSizeY; b++) {
+            if (typeof this.blocks[a][b] === 'undefined') continue;
             callback.call(this, this.blocks[a][b], a, b);
         }
     }
@@ -248,6 +257,7 @@ exports.forAllBlocks = function(callback) {
 exports.forSomeRandomBlocks = function(prob, callback) {
     for (var a = 0; a < this.gridSizeX; a++) {
         for (var b = 0; b < this.gridSizeY; b++) {
+            if (typeof this.blocks[a][b] === 'undefined') continue;
             if (Math.random() <= prob) {
                 callback.call(this, this.blocks[a][b], a, b);
             }
@@ -258,6 +268,7 @@ exports.forSomeRandomBlocks = function(prob, callback) {
 exports.forVisibleBlocks = function(callback) {
     for (var a = 0; a < this.gridSizeX; a++) {
         for (var b = 0; b < this.gridSizeY; b++) {
+            if (typeof this.blocks[a][b] === 'undefined') continue;
             if (this.blocks[a][b].visible)
                 callback.call(this, this.blocks[a][b], a, b);
         }
@@ -267,6 +278,7 @@ exports.forVisibleBlocks = function(callback) {
 exports.forInvisibleBlocks = function(callback) {
     for (var a = 0; a < this.gridSizeX; a++) {
         for (var b = 0; b < this.gridSizeY; b++) {
+            if (typeof this.blocks[a][b] === 'undefined') continue;
             if (!this.blocks[a][b].visible)
                 callback.call(this, this.blocks[a][b], a, b);
         }
@@ -276,6 +288,7 @@ exports.forInvisibleBlocks = function(callback) {
 exports.forSomeInvisibleBlocks = function(prob, callback) {
     for (var a = 0; a < this.gridSizeX; a++) {
         for (var b = 0; b < this.gridSizeY; b++) {
+            if (typeof this.blocks[a][b] === 'undefined') continue;
             if (!this.blocks[a][b].visible && Math.random() <= prob)
                 callback.call(this, this.blocks[a][b], a, b);
         }
@@ -371,7 +384,7 @@ window.onbeforeunload = function(){
 
     // setup full-panel, smaller panel behind it
     $('.begin-arrow').velocity({ 'top': '12px' }, { loop: true });
-    $('.panel').velocity("transition.slideUpIn");
+    //$('.panel').velocity("transition.slideUpIn");
 
     // go to initial block states
     BlockController.goToState(0);
@@ -391,9 +404,11 @@ $('.full-panel').click(function() {
     setTimeout( function() { BlockController.goToState(1); }, 1500);
 
     // finally show confetti and other content and make blocks grow
+    setTimeout( function() { BlockController.goToState(2); }, 7000);
+    $('.confetti').velocity("transition.fadeIn", { duration: 100, delay: 7500 });
     $('.panel-top').velocity("transition.fadeIn", { delay: 8000 });
     $('.panel-bottom').velocity("transition.fadeIn", { delay: 8000 });
-    setTimeout( function() { BlockController.goToState(2); }, 7000);
+    
 });
 
 },{"./blockController":2,"./gui":5}]},{},[6]);

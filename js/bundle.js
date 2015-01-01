@@ -45,7 +45,7 @@ exports.appearFromTransparent = function(block, x, y) {
     var t2 = new TWEEN.Tween(block.color)
         .to({ a: 0.5 }, 400)
         .easing(TWEEN.Easing.Quadratic.Out)
-        .delay(Math.random() * 4000)
+        .delay(Math.random() * 4500)
         .start();
 };
 
@@ -85,9 +85,14 @@ var Color = Isomer.Color;
 
 var transparency = 0.5;
 var colors = {};
-colors.orange = new Color(247, 145, 29, transparency);
-colors.blue = new Color(0, 172, 221, transparency);
-colors.green = new Color(121, 192, 66, transparency);
+// studios colors
+//colors.orange = new Color(247, 145, 29, transparency);
+//colors.blue = new Color(0, 172, 221, transparency);
+//colors.green = new Color(121, 192, 66, transparency);
+// altered colors
+colors.orange = new Color(255, 136, 39, transparency);
+colors.blue = new Color(7, 185, 226, transparency);
+colors.green = new Color(121, 209, 70, transparency);
 
 var blockSize = 1;
 var blockGrids = {};
@@ -359,7 +364,17 @@ function animate(time) {
     BlockController.draw();
 }
 
-$(window).scroll(function(e){
+$(window).resize(onResize);
+function onResize() {
+    // remove viewport if in landscape on mobile, or else background anim is obscured
+    if (screen.width < screen.height) {
+        $("#viewport").attr("content", "width=device-width, initial-scale=1, user-scalable=no, minimal-ui");
+    } else {
+        $("#viewport").attr("content", "user-scalable=no, minimal-ui");
+    }
+}
+
+$(window).scroll(function(e) {
     var scrollTop = $(this).scrollTop();
     var docHeight = $(document).height();
     var winHeight = $(window).height();
@@ -378,13 +393,14 @@ window.onbeforeunload = function(){
 
 // main
 (function () {
+    onResize();
+
     // setup canvas
     init();
     animate();
 
     // setup full-panel, smaller panel behind it
     $('.begin-arrow').velocity({ 'top': '12px' }, { loop: true });
-    //$('.panel').velocity("transition.slideUpIn");
 
     // go to initial block states
     BlockController.goToState(0);
@@ -392,13 +408,13 @@ window.onbeforeunload = function(){
 
 $('.full-panel').click(function() {
     // slide up full-panel
-    $('.full-panel').velocity({ 'top': '-100%' }, {
+    $('.full-panel').velocity({ 'top': '-150%' }, {
         duration: 1000,
         easing: "easeInQuart",
     });
 
     // slowly fade in years text
-    $('.years-text span').velocity("transition.fadeIn", { delay: 1500, stagger: 320 });
+    $('.years-text span').velocity("transition.fadeIn", { delay: 1500, stagger: 360 });
 
     // at the same time, begin populating hex tiles
     setTimeout( function() { BlockController.goToState(1); }, 1500);

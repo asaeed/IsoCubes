@@ -57,6 +57,8 @@ body {
     position: relative;
     top: 50%;
     transform: translateY(-50%);
+    -ms-transform: translateY(-50%); /* IE 9 */
+    -webkit-transform: translateY(-50%);
 }
 
 .logo {
@@ -155,6 +157,9 @@ body {
     width: 400px;
     left: 50%;
     transform: translate(-50%,-50%);
+    -ms-transform: translate(-50%,-50%); /* IE 9 */
+    -webkit-transform: translate(-50%,-50%);
+
     z-index: -1;
     opacity: 0;
 }
@@ -193,7 +198,8 @@ body {
     }
 }
 
-@media (min-width: 1200px) {
+/* 1281 ensures macbook air 11" doesn't get scaled up version */
+@media (min-width: 1281px) {
    .panel {
         width: 800px;
         height: 600px;

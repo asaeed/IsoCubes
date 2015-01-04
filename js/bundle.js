@@ -125,10 +125,10 @@ exports.goToState = function(stateNum) {
 
 	switch(stateNum) {
 		case 0:
-			console.log('blocks entering state 0');
+			//console.log('blocks entering state 0');
 			break;
 		case 1:
-			console.log('blocks entering state 1');
+			//console.log('blocks entering state 1');
 			// selector.forSomeInvisibleBlocks.call(blockGrids.orange, 0.6, animator.appearFromTransparent);
 			// selector.forSomeInvisibleBlocks.call(blockGrids.blue, 0.6, animator.appearFromTransparent);
 			// selector.forSomeInvisibleBlocks.call(blockGrids.green, 0.6, animator.appearFromTransparent);
@@ -137,21 +137,21 @@ exports.goToState = function(stateNum) {
 			selector.forInvisibleBlocks.call(blockGrids.green, animator.appearFromTransparent);
 			break;
 		case 2:
-			console.log('blocks entering state 3');
+			//console.log('blocks entering state 3');
 			selector.forAllBlocks.call(blockGrids.orange, animator.grow);
 			selector.forAllBlocks.call(blockGrids.blue, animator.grow);
 			selector.forAllBlocks.call(blockGrids.green, animator.grow);
 			setTimeout(function() { exports.goToState.call(this, 3); }, 3500);
 			break;
 		case 3:
-			console.log('blocks entering state 4');
+			//console.log('blocks entering state 4');
 			selector.forAllBlocks.call(blockGrids.orange, animator.reset);
 			selector.forAllBlocks.call(blockGrids.blue, animator.reset);
 			selector.forAllBlocks.call(blockGrids.green, animator.reset);
 			setTimeout(function() { exports.goToState.call(this, 2); }, 10000);
 			break;
 		default:
-			console.log('blocks unknown state');
+			//console.log('blocks unknown state');
 	}
 	
 
@@ -179,7 +179,7 @@ function BlockGridController(color, blockSize) {
     this.gridSizeX = 16;
     this.gridSizeY = 16;
     this.spaceApart = blockSize * 3;
-    this.origin = new Point(0, 0, -6);
+    this.origin = new Point(0, 0, -1);
 
     this.blockTemplate = Shape.Prism(this.origin, blockSize, blockSize, blockSize);
 }
@@ -197,9 +197,9 @@ BlockGridController.prototype.setup = function () {
         for (var y = 0; y < this.gridSizeY; y++) {
 
             // optimization - remove blocks that are offscreen
-            if (x+y < 4) continue;  // cut off bottom
-            if (x+y >= 28) continue;  // cut off top
-            if (x+this.gridSizeY-y <= 12) continue;  // cut off left
+            if (x+y < 2) continue;  // cut off bottom
+            if (x+y >= 32) continue;  // cut off top
+            if (x+this.gridSizeY-y <= 10) continue;  // cut off left
             if (x+this.gridSizeY-y > 20) continue;  // cut off right
 
             this.blocks[x][y] = {};
@@ -301,57 +301,17 @@ exports.forSomeInvisibleBlocks = function(prob, callback) {
 };
 },{}],5:[function(require,module,exports){
 
-// controlled params
-var guiParams = function() {
-
-    this.canvasColor = "#333333";
-    this.backColor = "#333333";
-    this.scrollTop = 0;
-    this.scrollPercent = 0;
-
-    //this.message = 'dat.gui';
-    //this.speed = 0.8;
-    //this.displayOutline = false;
-    //this.explode = function() { 
-    //};
-
-};
-
-exports.params = new guiParams();
-
-exports.setup = function() {
-    var gui = new dat.GUI();
-    dat.GUI.toggleHide();
-
-    gui.addColor(exports.params, 'canvasColor').onChange(function(value) {
-        $('#canvas').css('background-color', value);
-    });
-
-    gui.addColor(exports.params, 'backColor').onChange(function(value) {
-        $('body').css('background-color', value);
-    });
-
-    gui.add(exports.params, 'scrollTop').listen();
-    gui.add(exports.params, 'scrollPercent', 0, 100).listen();
-
-    //gui.add(exports.params, 'message');
-    //gui.add(exports.params, 'speed', -5, 5);
-    //gui.add(exports.params, 'displayOutline');
-    //gui.add(exports.params, 'explode');
-};
-},{}],6:[function(require,module,exports){
-
 // imports
 //var CustomShape = require('./customShape');
 var BlockController = require('./blockController');
-var Gui = require('./gui');
+//var Gui = require('./gui');
 
 // private variables
 var iso = new Isomer(document.getElementById("canvas"));
 
 // runs once
 function init() {
-    Gui.setup();
+    //Gui.setup();
     BlockController.setup();
 }
 
@@ -368,9 +328,18 @@ $(window).resize(onResize);
 function onResize() {
     // remove viewport if in landscape on mobile, or else background anim is obscured
     if (screen.width < screen.height) {
-        $("#viewport").attr("content", "width=device-width, initial-scale=1, user-scalable=no, minimal-ui");
+        $("#viewport").attr("content", "width=device-width, initial-scale=1, user-scalable=no");
     } else {
-        $("#viewport").attr("content", "user-scalable=no, minimal-ui");
+        $("#viewport").attr("content", "user-scalable=no");
+    }
+
+    // if on mobile version, cut canvas rez by half
+    if (window.innerWidth < 600) {
+        $('#canvas').attr('width', '500');
+        $('#canvas').attr('height', '1000');
+    } else {
+        $('#canvas').attr('width', '1500');
+        $('#canvas').attr('height', '3000');
     }
 }
 
@@ -382,8 +351,8 @@ $(window).scroll(function(e) {
     var scrollPercentRounded = Math.round(scrollPercent*100);
 
     console.log(scrollTop);
-    Gui.params.scrollTop = scrollTop;
-    Gui.params.scrollPercent = scrollPercentRounded;
+    //Gui.params.scrollTop = scrollTop;
+    //Gui.params.scrollPercent = scrollPercentRounded;
 
 });
 
@@ -449,8 +418,14 @@ $('.full-panel').click(function() {
     setTimeout( function() { BlockController.goToState(2); }, 7000);
     $('.confetti').velocity("transition.fadeIn", { duration: 100, delay: 7500 });
     $('.panel-top').velocity("transition.fadeIn", { delay: 8000 });
+    $('.years-subtitle').velocity("transition.fadeIn", { delay: 8000 });
     $('.panel-bottom').velocity("transition.fadeIn", { delay: 8000 });
+
+    // $('.confetti').velocity("transition.fadeIn", { duration: 1000, delay: 1000 });
+    // $('.panel-top').velocity("transition.fadeIn", { delay: 1000 });
+    // $('.years-subtitle').velocity("transition.fadeIn", { delay: 1000 });
+    // $('.panel-bottom').velocity("transition.fadeIn", { delay: 1000 });
     
 });
 
-},{"./blockController":2,"./gui":5}]},{},[6]);
+},{"./blockController":2}]},{},[5]);

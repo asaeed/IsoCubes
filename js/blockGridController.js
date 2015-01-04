@@ -36,7 +36,7 @@ BlockGridController.prototype.setup = function () {
         for (var y = 0; y < this.gridSizeY; y++) {
 
             // optimization - remove blocks that are offscreen
-            if (x+y < 4) continue;  // cut off bottom
+            if (x+y < 2) continue;  // cut off bottom
             if (x+y >= 32) continue;  // cut off top
             if (x+this.gridSizeY-y <= 10) continue;  // cut off left
             if (x+this.gridSizeY-y > 20) continue;  // cut off right

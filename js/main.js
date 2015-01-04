@@ -2,14 +2,14 @@
 // imports
 //var CustomShape = require('./customShape');
 var BlockController = require('./blockController');
-var Gui = require('./gui');
+//var Gui = require('./gui');
 
 // private variables
 var iso = new Isomer(document.getElementById("canvas"));
 
 // runs once
 function init() {
-    Gui.setup();
+    //Gui.setup();
     BlockController.setup();
 }
 
@@ -26,9 +26,18 @@ $(window).resize(onResize);
 function onResize() {
     // remove viewport if in landscape on mobile, or else background anim is obscured
     if (screen.width < screen.height) {
-        $("#viewport").attr("content", "width=device-width, initial-scale=1, user-scalable=no, minimal-ui");
+        $("#viewport").attr("content", "width=device-width, initial-scale=1, user-scalable=no");
     } else {
-        $("#viewport").attr("content", "user-scalable=no, minimal-ui");
+        $("#viewport").attr("content", "user-scalable=no");
+    }
+
+    // if on mobile version, cut canvas rez by half
+    if (window.innerWidth < 600) {
+        $('#canvas').attr('width', '500');
+        $('#canvas').attr('height', '1000');
+    } else {
+        $('#canvas').attr('width', '1500');
+        $('#canvas').attr('height', '3000');
     }
 }
 
@@ -40,8 +49,8 @@ $(window).scroll(function(e) {
     var scrollPercentRounded = Math.round(scrollPercent*100);
 
     console.log(scrollTop);
-    Gui.params.scrollTop = scrollTop;
-    Gui.params.scrollPercent = scrollPercentRounded;
+    //Gui.params.scrollTop = scrollTop;
+    //Gui.params.scrollPercent = scrollPercentRounded;
 
 });
 
@@ -107,6 +116,12 @@ $('.full-panel').click(function() {
     setTimeout( function() { BlockController.goToState(2); }, 7000);
     $('.confetti').velocity("transition.fadeIn", { duration: 100, delay: 7500 });
     $('.panel-top').velocity("transition.fadeIn", { delay: 8000 });
+    $('.years-subtitle').velocity("transition.fadeIn", { delay: 8000 });
     $('.panel-bottom').velocity("transition.fadeIn", { delay: 8000 });
+
+    // $('.confetti').velocity("transition.fadeIn", { duration: 1000, delay: 1000 });
+    // $('.panel-top').velocity("transition.fadeIn", { delay: 1000 });
+    // $('.years-subtitle').velocity("transition.fadeIn", { delay: 1000 });
+    // $('.panel-bottom').velocity("transition.fadeIn", { delay: 1000 });
     
 });

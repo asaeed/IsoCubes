@@ -49,10 +49,10 @@ exports.goToState = function(stateNum) {
 
 	switch(stateNum) {
 		case 0:
-			console.log('blocks entering state 0');
+			//console.log('blocks entering state 0');
 			break;
 		case 1:
-			console.log('blocks entering state 1');
+			//console.log('blocks entering state 1');
 			// selector.forSomeInvisibleBlocks.call(blockGrids.orange, 0.6, animator.appearFromTransparent);
 			// selector.forSomeInvisibleBlocks.call(blockGrids.blue, 0.6, animator.appearFromTransparent);
 			// selector.forSomeInvisibleBlocks.call(blockGrids.green, 0.6, animator.appearFromTransparent);
@@ -61,21 +61,21 @@ exports.goToState = function(stateNum) {
 			selector.forInvisibleBlocks.call(blockGrids.green, animator.appearFromTransparent);
 			break;
 		case 2:
-			console.log('blocks entering state 3');
+			//console.log('blocks entering state 3');
 			selector.forAllBlocks.call(blockGrids.orange, animator.grow);
 			selector.forAllBlocks.call(blockGrids.blue, animator.grow);
 			selector.forAllBlocks.call(blockGrids.green, animator.grow);
 			setTimeout(function() { exports.goToState.call(this, 3); }, 3500);
 			break;
 		case 3:
-			console.log('blocks entering state 4');
+			//console.log('blocks entering state 4');
 			selector.forAllBlocks.call(blockGrids.orange, animator.reset);
 			selector.forAllBlocks.call(blockGrids.blue, animator.reset);
 			selector.forAllBlocks.call(blockGrids.green, animator.reset);
 			setTimeout(function() { exports.goToState.call(this, 2); }, 10000);
 			break;
 		default:
-			console.log('blocks unknown state');
+			//console.log('blocks unknown state');
 	}
 	
 

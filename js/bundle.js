@@ -387,9 +387,35 @@ $(window).scroll(function(e) {
 
 });
 
-window.onbeforeunload = function(){
+window.onbeforeunload = function() {
     window.scrollTo(0, 0);
 };
+
+/* attempts to hide address bars on android chrome and ios - both have removed scrollTo() for hiding */
+/*
+window.onload = function() {
+    
+    setTimeout(function() { 
+        console.log('scrolling');
+        window.scrollTo(0, 1);
+        //launchIntoFullscreen(document.documentElement);
+        console.log($(window).scrollTop());
+    }, 1000);
+};
+
+// Find the right method, call on correct element
+function launchIntoFullscreen(element) {
+  if(element.requestFullscreen) {
+    element.requestFullscreen();
+  } else if(element.mozRequestFullScreen) {
+    element.mozRequestFullScreen();
+  } else if(element.webkitRequestFullscreen) {
+    element.webkitRequestFullscreen();
+  } else if(element.msRequestFullscreen) {
+    element.msRequestFullscreen();
+  }
+}
+*/
 
 // main
 (function () {

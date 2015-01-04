@@ -18,7 +18,7 @@ function BlockGridController(color, blockSize) {
     this.gridSizeX = 16;
     this.gridSizeY = 16;
     this.spaceApart = blockSize * 3;
-    this.origin = new Point(0, 0, -6);
+    this.origin = new Point(0, 0, -1);
 
     this.blockTemplate = Shape.Prism(this.origin, blockSize, blockSize, blockSize);
 }
@@ -37,8 +37,8 @@ BlockGridController.prototype.setup = function () {
 
             // optimization - remove blocks that are offscreen
             if (x+y < 4) continue;  // cut off bottom
-            if (x+y >= 28) continue;  // cut off top
-            if (x+this.gridSizeY-y <= 12) continue;  // cut off left
+            if (x+y >= 32) continue;  // cut off top
+            if (x+this.gridSizeY-y <= 10) continue;  // cut off left
             if (x+this.gridSizeY-y > 20) continue;  // cut off right
 
             this.blocks[x][y] = {};

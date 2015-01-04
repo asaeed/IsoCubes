@@ -23,10 +23,11 @@
 body {
     font-family: helvetica;
     margin: 0 auto;
-    min-width: 360px;
+    min-width: 320px;
+    
 
     /* uncomment this and comment the following to enable scrolling if scrolling site needed */
-    /* height: 1600px; */
+    /*height: 1600px;*/
     overflow: hidden;
 }
 
@@ -95,7 +96,7 @@ body {
     position: fixed;
     width: 100%;
     height: 100%;
-    min-width: 360px;
+    min-width: 320px;
     min-height: 280px;
 }
 
@@ -133,6 +134,17 @@ body {
     opacity: 0;
 }
 
+.social {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
+
+.social img {
+    height: 20px;
+    margin-left: 5px;
+}
+
 .panel-bottom {
     opacity: 0;
 }
@@ -167,34 +179,47 @@ body {
 @media (max-width: 600px) {
    .panel {
         width: 100%;
-        height: 336px;
+        height: 312px;
    }
 
    .years-text {
-        font-size: 66px;
+        font-size: 60px;
         letter-spacing: -10px;
     }
 
     .panel-top {
-        font-size: 18px;
-        line-height: 20px;
+        font-size: 14px;
+        line-height: 16px;
         padding: 10px 0 0 10px;
     }
 
     .new-year-text {
-        width: 127px;
-        font-size: 14px;
-        line-height: 16px;
-        padding: 0 0 10px 10px;
+        width: 110px;
+        font-size: 12px;
+        line-height: 14px;
+        padding: 0 0 0 10px;
+    }
+
+    .social {
+        /* remove cause it's too tiny to click anyway */
+        display: none;
+
+        /* in case we want to bring it back */
+        right: 10px;
+        top: 10px;
+    }
+
+    .social img {
+        height: 16px;
     }
 
     .confetti {
-        width: 360px;
+        width: 320px;
     }
 
     .logo-small {
-        margin: 30px 8px 0 0;
-        width: 72px;
+        margin: 24px 8px 0 0;
+        width: 70px;
     }
 }
 
@@ -222,9 +247,14 @@ body {
     }
 
     .new-year-text {
-        width: 236px;
+        width: 252px;
         font-size: 26px;
         line-height: 28px;
+    }
+
+    .social img {
+        height: 24px;
+        margin-left: 10px;
     }
 
     .confetti {

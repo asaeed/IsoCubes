@@ -429,8 +429,22 @@ $('.full-panel').click(function() {
 });
 
 $('.social-button').click(function() {
-    console.log('connect clicked');
     $('.social-overlay').css('display', 'block');
     $('.social-overlay').velocity('transition.fadeIn', { duration: 400 });
 });
+
+$('#panel-wrapper').click(closeSocialOverlay);
+//$('.social-overlay-close').click(closeSocialOverlay);
+
+function closeSocialOverlay(e) {
+    e.stopPropagation();
+    if (e.target.id !== 'panel-wrapper' && !$(e.target).hasClass('social-overlay-close')) return;
+
+    $('.social-overlay').velocity('transition.fadeOut', { 
+        duration: 400, 
+        complete: function(elements) {
+            $('.social-overlay').css('display', 'none');
+        } 
+    });
+}
 },{"./blockController":2}]},{},[5]);

@@ -255,6 +255,8 @@ a {
         width: 60px;
         display: inline;
         cursor: pointer;
+        padding: 10px;
+        margin-top: -4px;
     }
 
     .social-overlay {
@@ -273,7 +275,7 @@ a {
 
     .social-overlay-row a {
         position: relative;
-        padding: 10px;
+        padding: 20px;
     }
 
     .social-overlay .linkedin {
@@ -289,14 +291,15 @@ a {
     }
 
     .social-overlay-row a img {
-        height: 100px;
+        height: 66px;
     }
 
     .social-overlay-close {
         position: absolute;
-        right: 10px;
-        top: 10px;
-        width: 40px;
+        right: 0;
+        top: 0;
+        width: 28px;
+        padding: 12px;
         cursor: pointer;
     }
 }

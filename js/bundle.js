@@ -428,4 +428,9 @@ $('.full-panel').click(function() {
     
 });
 
+$('.social-button').click(function() {
+    console.log('connect clicked');
+    $('.social-overlay').css('display', 'block');
+    $('.social-overlay').velocity('transition.fadeIn', { duration: 400 });
+});
 },{"./blockController":2}]},{},[5]);

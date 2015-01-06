@@ -226,7 +226,7 @@ a {
     }
 
     .years-subtitle {
-        font-size: 12px;
+        font-size: 11px;
         top: -56px;
     }
 
@@ -255,7 +255,7 @@ a {
         width: 60px;
         display: inline;
         cursor: pointer;
-        padding: 10px;
+        padding: 10px 0;
         margin-top: -4px;
     }
 
